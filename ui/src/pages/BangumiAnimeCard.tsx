@@ -39,7 +39,7 @@ export default function BangumiAnimeCard({ anime }: BangumiAnimeCardProps) {
       className="group block rounded-xl overflow-hidden bg-neutral-800/60 hover:bg-neutral-700/60 transition-colors duration-150 flex flex-col shadow hover:shadow-lg"
     >
       {/* Poster */}
-      <div className="relative aspect-[2/3] bg-neutral-900 overflow-hidden flex-shrink-0">
+      <div className="relative aspect-[2/3] bg-[var(--bg-skeleton)] overflow-hidden flex-shrink-0">
         {posterUrl ? (
           <img
             src={posterUrl}
