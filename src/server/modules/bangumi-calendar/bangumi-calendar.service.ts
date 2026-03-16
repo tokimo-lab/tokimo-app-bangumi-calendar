@@ -2,9 +2,15 @@
  * Bangumi 每日放送服务
  *
  * 从 https://api.bgm.tv/calendar 获取当日放送列表，结果缓存 1 小时。
+ * 非动画类型通过 Bangumi 搜索 API 获取热门条目。
  */
 
-import type { BangumiCalendarOutput } from "@acme/types";
+import type {
+  BangumiCalendarOutput,
+  BangumiSubjectListOutput,
+  BangumiSubjectType,
+} from "@acme/types";
+import { bangumiClient } from "../../lib/bangumi-client";
 import { logger } from "../../lib/logger";
 
 const BGMTV_CALENDAR_URL = "https://api.bgm.tv/calendar";
@@ -35,7 +41,13 @@ interface CacheEntry {
   fetchedAt: number;
 }
 
+interface SubjectListCacheEntry {
+  data: BangumiSubjectListOutput;
+  fetchedAt: number;
+}
+
 let cache: CacheEntry | null = null;
+const subjectListCache = new Map<string, SubjectListCacheEntry>();
 
 // Raw Bangumi calendar item shape (subset we care about)
 interface RawBangumiItem {
@@ -126,6 +138,55 @@ export class BangumiCalendarService {
       );
       // Return stale cache if available, otherwise empty
       if (cache) return cache.data;
+      return [];
+    }
+  }
+
+  /** 按类型获取热门条目（书籍/游戏/音乐/三次元），缓存 1 小时 */
+  async getSubjectList(
+    type: BangumiSubjectType,
+    platform?: string,
+  ): Promise<BangumiSubjectListOutput> {
+    const cacheKey = `${type}:${platform ?? "all"}`;
+    const cached = subjectListCache.get(cacheKey);
+    if (cached && Date.now() - cached.fetchedAt < CACHE_TTL_MS) {
+      return cached.data;
+    }
+
+    try {
+      const items = await bangumiClient.browseSubjects(type, 100);
+      const filteredItems = platform
+        ? items.filter((item) => item.platform === platform)
+        : items;
+      const data: BangumiSubjectListOutput = filteredItems.map((item) => ({
+        id: item.id,
+        name: item.name ?? "",
+        nameCn: item.name_cn ?? item.name ?? "",
+        summary: item.summary,
+        airDate: item.date ?? item.air_date,
+        airWeekday: 0,
+        platform: item.platform,
+        eps: item.total_episodes ?? item.eps,
+        volumes: item.volumes,
+        images: item.images,
+        rating: item.rating
+          ? { total: item.rating.total, score: item.rating.score }
+          : undefined,
+        rank: item.rating?.rank ?? item.rank,
+        doing: item.collection?.doing,
+        collect: item.collection?.collect,
+        url: `https://bgm.tv/subject/${item.id}`,
+      }));
+
+      subjectListCache.set(cacheKey, { data, fetchedAt: Date.now() });
+      return data;
+    } catch (err) {
+      logger.error(
+        "BangumiCalendarService",
+        `Failed to fetch subject list (type=${type}, platform=${platform ?? "all"}): ${String(err)}`,
+      );
+      const stale = subjectListCache.get(cacheKey);
+      if (stale) return stale.data;
       return [];
     }
   }

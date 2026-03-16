@@ -1,18 +1,30 @@
 /**
- * Bangumi 每日放送 - 单部番剧卡片
+ * Bangumi 条目卡片（动画/书籍/游戏/音乐/三次元通用）
  */
 
 import { StarOutlined, Tooltip } from "@acme/components";
-import type { BangumiAnime } from "@acme/types";
+import type { BangumiAnime, BangumiSubjectType } from "@acme/types";
 import { useTranslation } from "react-i18next";
 
 interface BangumiAnimeCardProps {
   anime: BangumiAnime;
+  subjectType?: BangumiSubjectType;
 }
 
 const ns = "media.bangumiCalendar";
 
-export default function BangumiAnimeCard({ anime }: BangumiAnimeCardProps) {
+function formatCount(n: number): string {
+  return n >= 10000
+    ? `${(n / 10000).toFixed(1)}w`
+    : n >= 1000
+      ? `${(n / 1000).toFixed(1)}k`
+      : String(n);
+}
+
+export default function BangumiAnimeCard({
+  anime,
+  subjectType = 2,
+}: BangumiAnimeCardProps) {
   const { t } = useTranslation();
 
   const posterUrl =
@@ -30,6 +42,25 @@ export default function BangumiAnimeCard({ anime }: BangumiAnimeCardProps) {
         : score >= 6
           ? "text-green-400"
           : "text-neutral-400";
+
+  // 根据类别决定"在看/在读/在玩/在听"标签 key
+  const doingLabelKey =
+    subjectType === 1
+      ? `${ns}.reading`
+      : subjectType === 3
+        ? `${ns}.listening`
+        : subjectType === 4
+          ? `${ns}.playing`
+          : `${ns}.watching`;
+
+  // 卡片底部：集数/卷数信息
+  const episodeInfo = (() => {
+    if (subjectType === 1 && anime.volumes && anime.volumes > 0)
+      return `${anime.volumes} ${t(`${ns}.volumes`)}`;
+    if (subjectType !== 1 && anime.eps && anime.eps > 0)
+      return `${anime.eps} ${t(`${ns}.episodes`)}`;
+    return null;
+  })();
 
   return (
     <a
@@ -53,6 +84,15 @@ export default function BangumiAnimeCard({ anime }: BangumiAnimeCardProps) {
           </div>
         )}
 
+        {/* Platform badge（书籍/游戏/三次元） */}
+        {anime.platform && (
+          <div className="absolute top-1.5 left-1.5">
+            <span className="text-[10px] bg-black/60 text-neutral-300 rounded px-1.5 py-0.5">
+              {anime.platform}
+            </span>
+          </div>
+        )}
+
         {/* Score badge */}
         {score !== undefined && (
           <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 to-transparent pt-6 pb-1 px-2 flex items-center gap-1">
@@ -60,6 +100,11 @@ export default function BangumiAnimeCard({ anime }: BangumiAnimeCardProps) {
             <span className={`text-xs font-bold ${scoreColor}`}>
               {score.toFixed(1)}
             </span>
+            {anime.rank && (
+              <span className="ml-auto text-[10px] text-neutral-400">
+                #{anime.rank}
+              </span>
+            )}
           </div>
         )}
       </div>
@@ -78,21 +123,30 @@ export default function BangumiAnimeCard({ anime }: BangumiAnimeCardProps) {
           </p>
         )}
 
-        <div className="mt-auto flex items-center justify-between pt-1">
-          {anime.airDate && (
-            <span className="text-[11px] text-neutral-500">
-              {anime.airDate}
-            </span>
-          )}
+        <div className="mt-auto pt-1 flex flex-col gap-0.5">
+          <div className="flex items-center justify-between">
+            {anime.airDate && (
+              <span className="text-[11px] text-neutral-500">
+                {anime.airDate}
+              </span>
+            )}
+            {episodeInfo && (
+              <span className="text-[11px] text-neutral-500 ml-auto">
+                {episodeInfo}
+              </span>
+            )}
+          </div>
           {anime.doing !== undefined && anime.doing > 0 && (
-            <Tooltip title={t(`${ns}.watching`)} placement="top">
-              <span className="text-[11px] text-blue-400 ml-auto">
-                {anime.doing >= 1000
-                  ? `${(anime.doing / 1000).toFixed(1)}k`
-                  : anime.doing}{" "}
-                {t(`${ns}.watching`)}
+            <Tooltip title={t(doingLabelKey)} placement="top">
+              <span className="text-[11px] text-blue-400">
+                {formatCount(anime.doing)} {t(doingLabelKey)}
               </span>
             </Tooltip>
+          )}
+          {anime.collect !== undefined && anime.collect > 0 && (
+            <span className="text-[11px] text-neutral-500">
+              {formatCount(anime.collect)} {t(`${ns}.collected`)}
+            </span>
           )}
         </div>
       </div>

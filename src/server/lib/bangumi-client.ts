@@ -29,10 +29,26 @@ export interface BangumiSearchItem {
   name: string;
   name_cn: string;
   summary?: string;
+  /** 旧 GET 搜索 API 字段 */
   air_date?: string;
+  /** POST 搜索 API 字段（优先使用） */
+  date?: string;
+  platform?: string;
+  rank?: number;
+  eps?: number;
+  total_episodes?: number;
+  volumes?: number;
   rating?: {
+    rank?: number;
     score: number;
     total: number;
+  };
+  collection?: {
+    doing?: number;
+    wish?: number;
+    collect?: number;
+    on_hold?: number;
+    dropped?: number;
   };
   images?: {
     large?: string;
@@ -184,6 +200,40 @@ export class BangumiClient {
     );
   }
 
+  /** 按类型浏览热门条目（POST /v0/search/subjects，支持非动画类型） */
+  async browseSubjects(
+    type: BangumiSubjectType,
+    limit = 100,
+  ): Promise<BangumiSearchItem[]> {
+    return this.cachedRequest(`browse:${type}:${limit}`, async () => {
+      const response = await fetch(`${this.baseUrl}/search/subjects`, {
+        method: "POST",
+        headers: this.buildHeaders(),
+        body: JSON.stringify({
+          keyword: "",
+          filter: { type: [type], nsfw: false },
+          sort: "heat",
+          limit,
+          offset: 0,
+        }),
+        signal: AbortSignal.timeout(15_000),
+      });
+
+      if (!response.ok) {
+        throw new Error(
+          `Bangumi API error: ${response.status} ${response.statusText}`,
+        );
+      }
+
+      notifyApiCall("bangumi");
+
+      const data = (await response.json()) as {
+        data?: BangumiSearchItem[];
+      };
+      return data.data ?? [];
+    });
+  }
+
   /** 获取条目详情 */
   async getSubject(id: number): Promise<BangumiSubjectDetail | null> {
     return this.cachedRequest(`subject:${id}`, async () => {
@@ -217,3 +267,6 @@ export class BangumiClient {
     }
   }
 }
+
+/** 默认单例（无需 access token 的公开请求） */
+export const bangumiClient = new BangumiClient({});
