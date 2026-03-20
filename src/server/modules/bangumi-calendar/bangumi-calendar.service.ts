@@ -96,7 +96,7 @@ export class BangumiCalendarService {
       const response = await fetch(BGMTV_CALENDAR_URL, {
         headers: {
           "User-Agent":
-            "my-media/1.0 (https://github.com/acme/my-media) contact@example.com",
+            "tokimo/1.0 (https://github.com/acme/tokimo) contact@example.com",
           Accept: "application/json",
         },
         signal: AbortSignal.timeout(15_000),

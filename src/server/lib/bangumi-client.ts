@@ -91,7 +91,7 @@ interface CacheEntry<T = unknown> {
 
 const DEFAULT_CACHE_TTL = 60 * 60 * 1000; // 60 分钟
 const BANGUMI_BASE_URL = "https://api.bgm.tv/v0";
-const DEFAULT_USER_AGENT = "my-media/1.0 (https://github.com/example/my-media)";
+const DEFAULT_USER_AGENT = "tokimo/1.0 (https://github.com/example/tokimo)";
 
 export class BangumiClient {
   private accessToken?: string;
