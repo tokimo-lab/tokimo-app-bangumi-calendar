@@ -15,7 +15,7 @@ import {
   SaveOutlined,
   Spin,
   Tag,
-} from "@acme/components";
+} from "@tokiomo/components";
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useMessage } from "../../../hooks";

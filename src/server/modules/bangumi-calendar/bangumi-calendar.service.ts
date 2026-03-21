@@ -9,7 +9,7 @@ import type {
   BangumiCalendarOutput,
   BangumiSubjectListOutput,
   BangumiSubjectType,
-} from "@acme/types";
+} from "@tokiomo/types";
 import { bangumiClient } from "../../lib/bangumi-client";
 import { logger } from "../../lib/logger";
 
@@ -96,7 +96,7 @@ export class BangumiCalendarService {
       const response = await fetch(BGMTV_CALENDAR_URL, {
         headers: {
           "User-Agent":
-            "tokimo/1.0 (https://github.com/acme/tokimo) contact@example.com",
+            "tokimo/1.0 (https://github.com/tokimo-lab/tokimo) contact@example.com",
           Accept: "application/json",
         },
         signal: AbortSignal.timeout(15_000),
