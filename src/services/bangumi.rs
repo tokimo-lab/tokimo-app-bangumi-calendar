@@ -1,6 +1,6 @@
 use std::sync::Arc;
 
-use rust_client_api::bangumi::{
+use rust_client_api::metadata_providers::bangumi::{
     BangumiCalendarDay as RawCalendarDay, BangumiCalendarItem, BangumiClient, BangumiConfig,
     BangumiImages as RawImages, BangumiRating as RawRating, BangumiSearchItem,
 };
