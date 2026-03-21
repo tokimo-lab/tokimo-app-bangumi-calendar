@@ -92,6 +92,38 @@ pub struct BangumiInfoboxItem {
     pub value: serde_json::Value,
 }
 
+// ---- Calendar types (https://api.bgm.tv/calendar) ----
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct BangumiCalendarWeekday {
+    pub id: u32,
+    pub cn: Option<String>,
+    pub en: Option<String>,
+    pub ja: Option<String>,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct BangumiCalendarItem {
+    pub id: i64,
+    pub url: Option<String>,
+    pub name: Option<String>,
+    pub name_cn: Option<String>,
+    pub summary: Option<String>,
+    pub air_date: Option<String>,
+    pub air_weekday: Option<u32>,
+    pub images: Option<BangumiImages>,
+    pub rating: Option<BangumiRating>,
+    pub rank: Option<i32>,
+    pub collection: Option<BangumiCollection>,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct BangumiCalendarDay {
+    pub weekday: BangumiCalendarWeekday,
+    #[serde(default)]
+    pub items: Vec<BangumiCalendarItem>,
+}
+
 // ---- Internal response types ----
 
 #[derive(Deserialize)]
@@ -268,6 +300,38 @@ impl BangumiClient {
         let data: BangumiSubjectDetail = resp.json().await?;
         self.cache.set(&cache_key, &Some(&data)).await;
         Ok(Some(data))
+    }
+
+    /// Fetch the weekly anime calendar from `https://api.bgm.tv/calendar`.
+    pub async fn get_calendar(&self) -> Result<Vec<BangumiCalendarDay>, ClientError> {
+        let cache_key = "bangumi:calendar".to_string();
+        if let Some(cached) = self.cache.get::<Vec<BangumiCalendarDay>>(&cache_key).await {
+            return Ok(cached);
+        }
+
+        // Calendar endpoint is outside /v0, always at api.bgm.tv/calendar
+        let url = self
+            .base_url
+            .replace("/v0", "/calendar");
+
+        let resp = self
+            .http
+            .get(&url)
+            .headers(self.build_headers())
+            .timeout(Duration::from_secs(15))
+            .send()
+            .await?;
+
+        if !resp.status().is_success() {
+            return Err(ClientError::Api {
+                status: resp.status().as_u16(),
+                message: resp.text().await.unwrap_or_default(),
+            });
+        }
+
+        let data: Vec<BangumiCalendarDay> = resp.json().await?;
+        self.cache.set(&cache_key, &data).await;
+        Ok(data)
     }
 
     /// Test connection by fetching Neon Genesis Evangelion (ID: 1).

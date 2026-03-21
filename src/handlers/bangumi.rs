@@ -1,0 +1,44 @@
+use axum::{extract::State, http::HeaderMap, response::IntoResponse};
+use serde::Deserialize;
+use std::sync::Arc;
+
+use crate::handlers::ok;
+use crate::handlers::user::extract_session_auth;
+use crate::AppState;
+
+#[derive(Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct SubjectListQuery {
+    pub subject_type: u8,
+    pub platform: Option<String>,
+}
+
+/// GET /api/bangumi/calendar
+pub async fn get_calendar(
+    State(state): State<Arc<AppState>>,
+    headers: HeaderMap,
+) -> impl IntoResponse {
+    if let Err(e) = extract_session_auth(&state.db, &headers).await {
+        return e.into_response();
+    }
+
+    let data = state.bangumi.get_calendar().await;
+    ok(data).into_response()
+}
+
+/// GET /api/bangumi/subjects?subjectType=1&platform=日剧
+pub async fn get_subject_list(
+    State(state): State<Arc<AppState>>,
+    headers: HeaderMap,
+    axum::extract::Query(query): axum::extract::Query<SubjectListQuery>,
+) -> impl IntoResponse {
+    if let Err(e) = extract_session_auth(&state.db, &headers).await {
+        return e.into_response();
+    }
+
+    let data = state
+        .bangumi
+        .get_subject_list(query.subject_type, query.platform.as_deref())
+        .await;
+    ok(data).into_response()
+}

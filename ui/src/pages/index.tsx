@@ -5,10 +5,9 @@
  */
 
 import { cn, Empty, Skeleton, Tabs } from "@tokiomo/components";
-import type { BangumiSubjectType } from "@tokiomo/types";
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
-import { trpc } from "../../../lib/trpc";
+import { api } from "../../../generated/rust-api";
 import BangumiAnimeCard from "./BangumiAnimeCard";
 
 const ns = "media.bangumiCalendar";
@@ -22,7 +21,7 @@ function getTodayBangumiWeekday(): number {
 interface BangumiCategory {
   key: string;
   labelKey: string;
-  type: BangumiSubjectType;
+  type: number;
   platform?: string;
 }
 
@@ -57,10 +56,9 @@ function AnimeCalendar() {
   const { t } = useTranslation();
   const todayWeekday = getTodayBangumiWeekday();
 
-  const { data, isError, isLoading } =
-    trpc.bangumiCalendar.getCalendar.useQuery(undefined, {
-      staleTime: 60 * 60 * 1000,
-    });
+  const { data, isError, isLoading } = api.bangumi.getCalendar.useQuery({
+    staleTime: 60 * 60 * 1000,
+  });
 
   if (isLoading) return SKELETON_GRID;
   if (isError) {
@@ -110,20 +108,13 @@ function AnimeCalendar() {
   );
 }
 
-function SubjectList({
-  type,
-  platform,
-}: {
-  type: BangumiSubjectType;
-  platform?: string;
-}) {
+function SubjectList({ type, platform }: { type: number; platform?: string }) {
   const { t } = useTranslation();
 
-  const { data, isError, isLoading } =
-    trpc.bangumiCalendar.getSubjectList.useQuery(
-      { subjectType: type, platform },
-      { staleTime: 60 * 60 * 1000 },
-    );
+  const { data, isError, isLoading } = api.bangumi.getSubjectList.useQuery(
+    { subjectType: type, platform },
+    { staleTime: 60 * 60 * 1000 },
+  );
 
   if (isLoading) return SKELETON_GRID;
   if (isError) {

@@ -3,12 +3,12 @@
  */
 
 import { StarOutlined, Tooltip } from "@tokiomo/components";
-import type { BangumiAnime, BangumiSubjectType } from "@tokiomo/types";
 import { useTranslation } from "react-i18next";
+import type { BangumiAnime } from "../../../generated/rust-api";
 
 interface BangumiAnimeCardProps {
   anime: BangumiAnime;
-  subjectType?: BangumiSubjectType;
+  subjectType?: number;
 }
 
 const ns = "media.bangumiCalendar";

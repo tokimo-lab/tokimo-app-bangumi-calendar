@@ -18,8 +18,8 @@ import {
 } from "@tokiomo/components";
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
+import { api } from "../../../generated/rust-api";
 import { useMessage } from "../../../hooks";
-import { trpc } from "../../../lib/trpc";
 
 /** Bangumi 设置内容（可嵌入 tab 使用） */
 export function BangumiSettingsContent() {
@@ -28,12 +28,10 @@ export function BangumiSettingsContent() {
   const [showToken, setShowToken] = useState(false);
   const message = useMessage();
 
-  const settingsQuery = trpc.admin.getBangumiSettings.useQuery();
-  const updateSettingsMutation = trpc.admin.updateBangumiSettings.useMutation();
-  const testMutation = trpc.admin.testBangumiConnection.useMutation();
-  const statusQuery = trpc.systemStatus.getAll.useQuery(undefined, {
-    refetchInterval: false,
-  });
+  const settingsQuery = api.externalDb.getBangumi.useQuery();
+  const updateSettingsMutation = api.externalDb.updateBangumi.useMutation();
+  const testMutation = api.externalDb.testBangumi.useMutation();
+  const statusQuery = api.externalDb.status.useQuery();
 
   const bangumiStatus = statusQuery.data?.bangumi;
 
@@ -89,12 +87,12 @@ export function BangumiSettingsContent() {
           !statusQuery.isLoading && (
             <span
               className={
-                bangumiStatus?.isConnected
+                bangumiStatus?.isConfigured
                   ? "text-sm text-green-600 dark:text-green-500"
                   : "text-sm text-gray-400 dark:text-gray-500"
               }
             >
-              {bangumiStatus?.isConnected
+              {bangumiStatus?.isConfigured
                 ? t("media.bangumiSettings.connected")
                 : t("media.bangumiSettings.disconnected")}
             </span>
@@ -153,9 +151,16 @@ export function BangumiSettingsContent() {
         )}
       </Card>
 
-      {/* 错误信息 - 仅在有错时显示 */}
-      {bangumiStatus?.errorMessage && (
-        <Alert type="error" message={bangumiStatus.errorMessage} showIcon />
+      {/* 错误信息 - 仅在测试失败时显示 */}
+      {testMutation.data && !testMutation.data.success && (
+        <Alert
+          type="error"
+          message={
+            testMutation.data.errorMessage ||
+            t("media.bangumiSettings.testFailed")
+          }
+          showIcon
+        />
       )}
 
       {/* Access Token 配置 */}
