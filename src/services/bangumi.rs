@@ -80,13 +80,14 @@ pub struct BangumiService {
 }
 
 impl BangumiService {
-    pub fn new() -> Self {
+    pub fn new(http_client: reqwest::Client) -> Self {
         Self {
             client: BangumiClient::new(BangumiConfig {
                 access_token: None,
                 base_url: None,
                 user_agent: None,
                 cache_ttl: None,
+                http_client,
             }),
         }
     }
@@ -245,6 +246,6 @@ fn to_anime_from_search(item: BangumiSearchItem) -> BangumiAnime {
 }
 
 /// Create a shared BangumiService wrapped in Arc.
-pub fn create_bangumi_service() -> Arc<BangumiService> {
-    Arc::new(BangumiService::new())
+pub fn create_bangumi_service(http_client: reqwest::Client) -> Arc<BangumiService> {
+    Arc::new(BangumiService::new(http_client))
 }

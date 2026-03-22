@@ -14,6 +14,7 @@ pub struct BangumiConfig {
     pub base_url: Option<String>,
     pub user_agent: Option<String>,
     pub cache_ttl: Option<Duration>,
+    pub http_client: reqwest::Client,
 }
 
 /// Subject type: 1=Book, 2=Anime, 3=Music, 4=Game, 6=Real.
@@ -167,7 +168,7 @@ impl BangumiClient {
             access_token: config.access_token,
             base_url: config.base_url.unwrap_or_else(|| BANGUMI_BASE_URL.to_string()),
             user_agent: config.user_agent.unwrap_or_else(|| DEFAULT_USER_AGENT.to_string()),
-            http: reqwest::Client::new(),
+            http: config.http_client,
             cache: RequestCache::new(config.cache_ttl.unwrap_or(DEFAULT_CACHE_TTL)),
         }
     }
