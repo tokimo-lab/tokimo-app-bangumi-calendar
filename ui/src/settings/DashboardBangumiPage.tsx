@@ -18,8 +18,8 @@ import {
 } from "@tokiomo/components";
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
+import { useMessage } from "@/system";
 import { api } from "../../../generated/rust-api";
-import { useMessage } from "../../../hooks";
 
 /** Bangumi 设置内容（可嵌入 tab 使用） */
 export function BangumiSettingsContent() {
