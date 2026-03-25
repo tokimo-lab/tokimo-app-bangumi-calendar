@@ -89,7 +89,7 @@ export function BangumiSettingsContent() {
               className={
                 bangumiStatus?.isConfigured
                   ? "text-sm text-green-600 dark:text-green-500"
-                  : "text-sm text-gray-400 dark:text-gray-500"
+                  : "text-sm text-zinc-600 dark:text-gray-500"
               }
             >
               {bangumiStatus?.isConfigured
@@ -107,7 +107,7 @@ export function BangumiSettingsContent() {
               {t("media.systemStatus.apiUsage.todayUsed")}:{" "}
               <strong>{bangumiStatus?.dailyUsage ?? 0}</strong>
               {bangumiStatus?.dailyLimit != null ? (
-                <span className="text-gray-500 dark:text-gray-400">
+                <span className="text-gray-500 dark:text-zinc-400">
                   {" "}
                   / {bangumiStatus.dailyLimit}{" "}
                   <span className="text-xs">
@@ -121,7 +121,7 @@ export function BangumiSettingsContent() {
                   </span>
                 </span>
               ) : (
-                <span className="text-gray-400 dark:text-gray-500 ml-1 text-xs">
+                <span className="text-zinc-600 dark:text-gray-500 ml-1 text-xs">
                   ({t("media.systemStatus.apiUsage.unlimited")})
                 </span>
               )}
@@ -254,7 +254,7 @@ export function BangumiSettingsContent() {
                       {testMutation.data.sampleTitleCn &&
                         testMutation.data.sampleTitleCn !==
                           testMutation.data.sampleTitle && (
-                          <span className="text-gray-400 ml-2">
+                          <span className="text-zinc-600 dark:text-zinc-400 ml-2">
                             ({testMutation.data.sampleTitleCn})
                           </span>
                         )}
