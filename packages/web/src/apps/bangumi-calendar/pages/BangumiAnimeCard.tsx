@@ -4,7 +4,7 @@
 
 import { StarOutlined, Tooltip } from "@tokiomo/components";
 import { useTranslation } from "react-i18next";
-import type { BangumiAnime } from "../../../generated/rust-api";
+import type { BangumiAnime } from "@/generated/rust-api";
 
 interface BangumiAnimeCardProps {
   anime: BangumiAnime;

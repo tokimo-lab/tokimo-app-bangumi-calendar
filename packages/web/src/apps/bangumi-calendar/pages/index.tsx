@@ -7,7 +7,7 @@
 import { cn, Empty, Skeleton, Tabs } from "@tokiomo/components";
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
-import { api } from "../../../generated/rust-api";
+import { api } from "@/generated/rust-api";
 import BangumiAnimeCard from "./BangumiAnimeCard";
 
 const ns = "media.bangumiCalendar";
