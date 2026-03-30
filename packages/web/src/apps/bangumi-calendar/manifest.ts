@@ -5,7 +5,6 @@ export const manifest: AppManifest = {
   id: "bangumi-calendar",
   name: "Bangumi Calendar",
   category: "system",
-  pageIds: ["bangumi-calendar"],
   defaultSize: { width: 1100, height: 750 },
   icon: Clapperboard,
   image: "/page-icons/bangumi-calendar.png",
