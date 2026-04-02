@@ -148,7 +148,7 @@ export default function BangumiCalendarPage() {
         <h1 className="text-xl font-semibold text-neutral-100">
           {t(`${ns}.title`)}
         </h1>
-        <span className="text-xs text-neutral-500">{t(`${ns}.poweredBy`)}</span>
+        <span className="text-xs text-fg-muted">{t(`${ns}.poweredBy`)}</span>
       </div>
 
       {/* Category selector */}
@@ -175,7 +175,7 @@ export default function BangumiCalendarPage() {
         <AnimeCalendar />
       ) : (
         <>
-          <p className="text-xs text-neutral-500 mb-3">{t(`${ns}.trending`)}</p>
+          <p className="text-xs text-fg-muted mb-3">{t(`${ns}.trending`)}</p>
           <SubjectList
             type={activeCategory.type}
             platform={activeCategory.platform}

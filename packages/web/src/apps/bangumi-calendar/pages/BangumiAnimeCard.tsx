@@ -36,12 +36,12 @@ export default function BangumiAnimeCard({
   const score = anime.rating?.score;
   const scoreColor =
     score === undefined
-      ? "text-neutral-400"
+      ? "text-fg-muted"
       : score >= 8
         ? "text-yellow-400"
         : score >= 6
           ? "text-green-400"
-          : "text-neutral-400";
+          : "text-fg-muted";
 
   // 根据类别决定"在看/在读/在玩/在听"标签 key
   const doingLabelKey =
@@ -79,7 +79,7 @@ export default function BangumiAnimeCard({
             loading="lazy"
           />
         ) : (
-          <div className="w-full h-full flex items-center justify-center p-3 text-center text-neutral-500 text-xs">
+          <div className="w-full h-full flex items-center justify-center p-3 text-center text-fg-muted text-xs">
             {displayTitle}
           </div>
         )}
@@ -101,7 +101,7 @@ export default function BangumiAnimeCard({
               {score.toFixed(1)}
             </span>
             {anime.rank && (
-              <span className="ml-auto text-[10px] text-neutral-400">
+              <span className="ml-auto text-[10px] text-fg-muted">
                 #{anime.rank}
               </span>
             )}
@@ -118,20 +118,16 @@ export default function BangumiAnimeCard({
         </Tooltip>
 
         {originalTitle && (
-          <p className="text-[11px] text-neutral-400 truncate">
-            {originalTitle}
-          </p>
+          <p className="text-[11px] text-fg-muted truncate">{originalTitle}</p>
         )}
 
         <div className="mt-auto pt-1 flex flex-col gap-0.5">
           <div className="flex items-center justify-between">
             {anime.airDate && (
-              <span className="text-[11px] text-neutral-500">
-                {anime.airDate}
-              </span>
+              <span className="text-[11px] text-fg-muted">{anime.airDate}</span>
             )}
             {episodeInfo && (
-              <span className="text-[11px] text-neutral-500 ml-auto">
+              <span className="text-[11px] text-fg-muted ml-auto">
                 {episodeInfo}
               </span>
             )}
@@ -144,7 +140,7 @@ export default function BangumiAnimeCard({
             </Tooltip>
           )}
           {anime.collect !== undefined && anime.collect > 0 && (
-            <span className="text-[11px] text-neutral-500">
+            <span className="text-[11px] text-fg-muted">
               {formatCount(anime.collect)} {t(`${ns}.collected`)}
             </span>
           )}
