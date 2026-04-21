@@ -2,7 +2,7 @@
  * Bangumi 条目卡片（动画/书籍/游戏/音乐/三次元通用）
  */
 
-import { StarOutlined, Tooltip } from "@tokiomo/components";
+import { StarOutlined, Tooltip } from "@tokimo/ui";
 import { useTranslation } from "react-i18next";
 import type { BangumiAnime } from "@/generated/rust-api";
 

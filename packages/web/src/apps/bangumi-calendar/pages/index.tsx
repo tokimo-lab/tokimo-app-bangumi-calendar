@@ -4,7 +4,7 @@
  * 支持切换类别：动画（按星期分组日历）/ 书籍 / 游戏 / 音乐 / 日剧 / 欧美剧 / 华语剧
  */
 
-import { cn, Empty, Skeleton, Tabs } from "@tokiomo/components";
+import { cn, Empty, Skeleton, Tabs } from "@tokimo/ui";
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { api } from "@/generated/rust-api";
