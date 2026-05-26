@@ -2,15 +2,16 @@
  * Bangumi 每日放送页面
  *
  * 支持切换类别：动画（按星期分组日历）/ 书籍 / 游戏 / 音乐 / 日剧 / 欧美剧 / 华语剧
+ *
+ * API: calls host server at /api/apps/bangumi/calendar and /api/apps/bangumi/subjects
  */
 
+import { useQuery } from "@tanstack/react-query";
 import { cn, Empty, Skeleton, Tabs } from "@tokimo/ui";
 import { useState } from "react";
-import { useTranslation } from "react-i18next";
-import { api } from "@/generated/rust-api";
+import { useT } from "../TranslatorContext";
+import type { BangumiAnime, BangumiCalendarDay } from "../types";
 import BangumiAnimeCard from "./BangumiAnimeCard";
-
-const ns = "media.bangumiCalendar";
 
 // JS Date.getDay(): 0=Sun, 1=Mon … 6=Sat → Bangumi: 1=Mon … 7=Sun
 function getTodayBangumiWeekday(): number {
@@ -52,17 +53,40 @@ const SKELETON_GRID = (
   </div>
 );
 
+async function fetchCalendar(): Promise<BangumiCalendarDay[]> {
+  const resp = await fetch("/api/apps/bangumi/calendar", {
+    credentials: "same-origin",
+  });
+  if (!resp.ok) throw new Error(`calendar fetch failed: ${resp.status}`);
+  return resp.json() as Promise<BangumiCalendarDay[]>;
+}
+
+async function fetchSubjectList(
+  subjectType: number,
+  platform?: string,
+): Promise<BangumiAnime[]> {
+  const params = new URLSearchParams({ subjectType: String(subjectType) });
+  if (platform) params.set("platform", platform);
+  const resp = await fetch(`/api/apps/bangumi/subjects?${params}`, {
+    credentials: "same-origin",
+  });
+  if (!resp.ok) throw new Error(`subjects fetch failed: ${resp.status}`);
+  return resp.json() as Promise<BangumiAnime[]>;
+}
+
 function AnimeCalendar() {
-  const { t } = useTranslation();
+  const t = useT();
   const todayWeekday = getTodayBangumiWeekday();
 
-  const { data, isError, isLoading } = api.bangumi.getCalendar.useQuery({
+  const { data, isError, isLoading } = useQuery({
+    queryKey: ["bangumi", "calendar"],
+    queryFn: fetchCalendar,
     staleTime: 60 * 60 * 1000,
   });
 
   if (isLoading) return SKELETON_GRID;
   if (isError) {
-    return <Empty description={t(`${ns}.loadFailed`)} />;
+    return <Empty description={t("loadFailed")} />;
   }
 
   const tabItems = (data ?? []).map((day) => {
@@ -74,7 +98,7 @@ function AnimeCalendar() {
           {day.weekdayCn}
           {isToday && (
             <span className="ml-1 text-[10px] bg-accent text-white rounded px-1">
-              {t(`${ns}.today`)}
+              {t("today")}
             </span>
           )}
         </span>
@@ -82,7 +106,7 @@ function AnimeCalendar() {
       children: (
         <div className="pt-4">
           {day.items.length === 0 ? (
-            <Empty description={t(`${ns}.noItems`)} />
+            <Empty description={t("noItems")} />
           ) : (
             <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-6 xl:grid-cols-7 2xl:grid-cols-8 gap-3">
               {day.items.map((anime) => (
@@ -96,7 +120,7 @@ function AnimeCalendar() {
   });
 
   if (tabItems.length === 0) {
-    return <Empty description={t(`${ns}.loadFailed`)} />;
+    return <Empty description={t("loadFailed")} />;
   }
 
   return (
@@ -109,20 +133,21 @@ function AnimeCalendar() {
 }
 
 function SubjectList({ type, platform }: { type: number; platform?: string }) {
-  const { t } = useTranslation();
+  const t = useT();
 
-  const { data, isError, isLoading } = api.bangumi.getSubjectList.useQuery(
-    { subjectType: type, platform },
-    { staleTime: 60 * 60 * 1000 },
-  );
+  const { data, isError, isLoading } = useQuery({
+    queryKey: ["bangumi", "subjects", type, platform],
+    queryFn: () => fetchSubjectList(type, platform),
+    staleTime: 60 * 60 * 1000,
+  });
 
   if (isLoading) return SKELETON_GRID;
   if (isError) {
-    return <Empty description={t(`${ns}.loadFailed`)} />;
+    return <Empty description={t("loadFailed")} />;
   }
 
   if (!data || data.length === 0) {
-    return <Empty description={t(`${ns}.noTrending`)} />;
+    return <Empty description={t("noTrending")} />;
   }
 
   return (
@@ -135,7 +160,7 @@ function SubjectList({ type, platform }: { type: number; platform?: string }) {
 }
 
 export default function BangumiCalendarPage() {
-  const { t } = useTranslation();
+  const t = useT();
   const [activeCategoryKey, setActiveCategoryKey] = useState("anime");
   const activeCategory =
     SUBJECT_CATEGORIES.find((item) => item.key === activeCategoryKey) ??
@@ -145,10 +170,8 @@ export default function BangumiCalendarPage() {
     <div className="p-4 md:p-6">
       {/* Header */}
       <div className="mb-4 flex items-center justify-between flex-wrap gap-2">
-        <h1 className="text-xl font-semibold text-neutral-100">
-          {t(`${ns}.title`)}
-        </h1>
-        <span className="text-xs text-fg-muted">{t(`${ns}.poweredBy`)}</span>
+        <h1 className="text-xl font-semibold text-neutral-100">{t("title")}</h1>
+        <span className="text-xs text-fg-muted">{t("poweredBy")}</span>
       </div>
 
       {/* Category selector */}
@@ -159,13 +182,13 @@ export default function BangumiCalendarPage() {
             type="button"
             onClick={() => setActiveCategoryKey(key)}
             className={cn(
-              "px-3 py-1.5 rounded-full text-sm font-medium transition-colors duration-150 select-none",
+              "px-3 py-1.5 rounded-full text-sm font-medium transition-colors duration-150 select-none cursor-pointer",
               activeCategoryKey === key
                 ? "bg-accent text-white"
                 : "bg-neutral-700/60 text-neutral-300 hover:bg-neutral-600/60",
             )}
           >
-            {t(`${ns}.${labelKey}`)}
+            {t(labelKey)}
           </button>
         ))}
       </div>
@@ -175,7 +198,7 @@ export default function BangumiCalendarPage() {
         <AnimeCalendar />
       ) : (
         <>
-          <p className="text-xs text-fg-muted mb-3">{t(`${ns}.trending`)}</p>
+          <p className="text-xs text-fg-muted mb-3">{t("trending")}</p>
           <SubjectList
             type={activeCategory.type}
             platform={activeCategory.platform}

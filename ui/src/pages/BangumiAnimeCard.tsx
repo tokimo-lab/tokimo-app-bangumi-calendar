@@ -3,15 +3,13 @@
  */
 
 import { StarOutlined, Tooltip } from "@tokimo/ui";
-import { useTranslation } from "react-i18next";
-import type { BangumiAnime } from "@/generated/rust-api";
+import { useT } from "../TranslatorContext";
+import type { BangumiAnime } from "../types";
 
 interface BangumiAnimeCardProps {
   anime: BangumiAnime;
   subjectType?: number;
 }
-
-const ns = "media.bangumiCalendar";
 
 function formatCount(n: number): string {
   return n >= 10000
@@ -25,7 +23,7 @@ export default function BangumiAnimeCard({
   anime,
   subjectType = 2,
 }: BangumiAnimeCardProps) {
-  const { t } = useTranslation();
+  const t = useT();
 
   const posterUrl =
     anime.images?.large || anime.images?.common || anime.images?.medium || null;
@@ -43,22 +41,20 @@ export default function BangumiAnimeCard({
           ? "text-green-400"
           : "text-fg-muted";
 
-  // 根据类别决定"在看/在读/在玩/在听"标签 key
   const doingLabelKey =
     subjectType === 1
-      ? `${ns}.reading`
+      ? "reading"
       : subjectType === 3
-        ? `${ns}.listening`
+        ? "listening"
         : subjectType === 4
-          ? `${ns}.playing`
-          : `${ns}.watching`;
+          ? "playing"
+          : "watching";
 
-  // 卡片底部：集数/卷数信息
   const episodeInfo = (() => {
     if (subjectType === 1 && anime.volumes && anime.volumes > 0)
-      return `${anime.volumes} ${t(`${ns}.volumes`)}`;
+      return `${anime.volumes} ${t("volumes")}`;
     if (subjectType !== 1 && anime.eps && anime.eps > 0)
-      return `${anime.eps} ${t(`${ns}.episodes`)}`;
+      return `${anime.eps} ${t("episodes")}`;
     return null;
   })();
 
@@ -84,7 +80,6 @@ export default function BangumiAnimeCard({
           </div>
         )}
 
-        {/* Platform badge（书籍/游戏/三次元） */}
         {anime.platform && (
           <div className="absolute top-1.5 left-1.5">
             <span className="text-[10px] bg-black/60 text-neutral-300 rounded px-1.5 py-0.5">
@@ -93,7 +88,6 @@ export default function BangumiAnimeCard({
           </div>
         )}
 
-        {/* Score badge */}
         {score !== undefined && (
           <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 to-transparent pt-6 pb-1 px-2 flex items-center gap-1">
             <StarOutlined className={`w-3 h-3 ${scoreColor}`} />
@@ -141,7 +135,7 @@ export default function BangumiAnimeCard({
           )}
           {anime.collect !== undefined && anime.collect > 0 && (
             <span className="text-[11px] text-fg-muted">
-              {formatCount(anime.collect)} {t(`${ns}.collected`)}
+              {formatCount(anime.collect)} {t("collected")}
             </span>
           )}
         </div>

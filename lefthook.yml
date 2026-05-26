@@ -1,0 +1,16 @@
+# Tokimo monorepo pre-commit hooks (Lefthook)
+pre-commit:
+  parallel: true
+  commands:
+    rustfmt:
+      tags: rust fmt
+      glob: "*.rs"
+      run: scripts/lefthook-rustfmt.sh {staged_files}
+      stage_fixed: true
+
+pre-push:
+  commands:
+    fmt-check:
+      run: cargo fmt -p tokimo-app-bangumi-calendar -- --check
+    clippy:
+      run: cargo clippy -p tokimo-app-bangumi-calendar --lib --bins --tests -- -D warnings

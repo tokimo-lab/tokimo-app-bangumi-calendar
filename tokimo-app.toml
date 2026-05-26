@@ -1,0 +1,20 @@
+# Tokimo app manifest（供主 server 读取，注册 / spawn / 资源代理 / launchpad 展示）
+[app]
+id          = "bangumi-calendar"
+display     = "Bangumi Calendar"
+version     = "0.1.0"
+description = "Tokimo Bangumi anime release calendar — daily broadcast schedule and trending subjects."
+
+[runtime]
+lifecycle    = "resident"
+binary       = "tokimo-app-bangumi-calendar"
+ui_dist      = "ui/dist"
+
+[ui]
+entry        = "assets/index.js"
+window_type  = "bangumi-calendar"
+category     = "app"
+icon         = "Clapperboard"
+color        = "#ec4899"
+width        = 1100
+height       = 750
