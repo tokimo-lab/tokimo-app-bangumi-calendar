@@ -10,8 +10,8 @@ mod assets;
 mod cli;
 
 use clap::{Parser, Subcommand};
-use tokimo_bus_client::{BusClient, ClientConfig};
 use tokimo_bus_cli::TokimoAuthArgs;
+use tokimo_bus_client::{BusClient, ClientConfig};
 use tracing::{error, info};
 
 #[derive(Parser, Debug)]
