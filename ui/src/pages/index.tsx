@@ -53,12 +53,26 @@ const SKELETON_GRID = (
   </div>
 );
 
+interface ApiEnvelope<T> {
+  success: boolean;
+  data?: T;
+  error?: string;
+}
+
+async function unwrap<T>(resp: Response, label: string): Promise<T> {
+  if (!resp.ok) throw new Error(`${label} fetch failed: ${resp.status}`);
+  const body = (await resp.json()) as ApiEnvelope<T>;
+  if (!body.success || body.data === undefined) {
+    throw new Error(`${label} api error: ${body.error ?? "unknown"}`);
+  }
+  return body.data;
+}
+
 async function fetchCalendar(): Promise<BangumiCalendarDay[]> {
   const resp = await fetch("/api/apps/bangumi/calendar", {
     credentials: "same-origin",
   });
-  if (!resp.ok) throw new Error(`calendar fetch failed: ${resp.status}`);
-  return resp.json() as Promise<BangumiCalendarDay[]>;
+  return unwrap<BangumiCalendarDay[]>(resp, "calendar");
 }
 
 async function fetchSubjectList(
@@ -70,8 +84,7 @@ async function fetchSubjectList(
   const resp = await fetch(`/api/apps/bangumi/subjects?${params}`, {
     credentials: "same-origin",
   });
-  if (!resp.ok) throw new Error(`subjects fetch failed: ${resp.status}`);
-  return resp.json() as Promise<BangumiAnime[]>;
+  return unwrap<BangumiAnime[]>(resp, "subjects");
 }
 
 function AnimeCalendar() {
