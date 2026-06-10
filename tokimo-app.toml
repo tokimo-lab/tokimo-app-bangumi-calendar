@@ -15,6 +15,7 @@ entry        = "assets/index.js"
 window_type  = "bangumi-calendar"
 category     = "app"
 icon         = "Clapperboard"
+image        = "icon.png"
 color        = "#ec4899"
 width        = 1100
 height       = 750
