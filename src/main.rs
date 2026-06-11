@@ -18,7 +18,7 @@ use tracing::{error, info};
 #[command(
     name = "tokimo-app-bangumi-calendar",
     about = "Bangumi Calendar — Tokimo 子 app CLI",
-    long_about = "Bangumi Calendar CLI — 浏览每日新番放送日历与追番信息。",
+    long_about = "Bangumi Calendar CLI — browse daily anime broadcast calendar and tracking info.",
     term_width = 100
 )]
 struct Cli {
@@ -30,7 +30,7 @@ struct Cli {
 
 #[derive(Subcommand, Debug)]
 enum Command {
-    /// 打印 app 版本信息
+    /// Print app version info
     Version,
 }
 
