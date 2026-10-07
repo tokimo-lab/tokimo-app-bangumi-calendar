@@ -25,6 +25,11 @@ export default defineApp({
     defaultSize: { width: 1100, height: 750 },
     category: "app",
   },
+  standalone: {
+    createWindow: (route) => ({ type: "bangumi-calendar", route }),
+    getRoute: (window) =>
+      window.type === "bangumi-calendar" ? (window.route ?? "/") : null,
+  },
   mount(container, ctx): Dispose {
     const queryClient = new QueryClient({
       defaultOptions: { queries: { retry: 1, staleTime: 30_000 } },
