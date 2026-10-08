@@ -180,7 +180,7 @@ export default function BangumiCalendarPage() {
     SUBJECT_CATEGORIES[0];
 
   return (
-    <div className="p-4 md:p-6">
+    <div className="app-safe-area min-h-full bg-surface-base [--app-safe-area-padding:1rem] md:[--app-safe-area-padding:1.5rem]">
       {/* Header */}
       <div className="mb-4 flex items-center justify-between flex-wrap gap-2">
         <h1 className="text-xl font-semibold text-neutral-100">{t("title")}</h1>
