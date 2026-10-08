@@ -1,8 +1,10 @@
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import type { Dispose } from "@tokimo/sdk";
-import { defineApp, makeTranslator } from "@tokimo/sdk";
+import { defineApp, makeTranslator, RuntimeProvider } from "@tokimo/sdk";
 import {
   ConfigProvider,
+  cssVar,
+  TOKEN,
   ToastProvider,
   enUS as uiEnUS,
   zhCN as uiZhCN,
@@ -26,6 +28,8 @@ export default defineApp({
     category: "app",
   },
   standalone: {
+    layout: "document",
+    background: cssVar(TOKEN.surfaceBase),
     createWindow: (route) => ({ type: "bangumi-calendar", route }),
     getRoute: (window) =>
       window.type === "bangumi-calendar" ? (window.route ?? "/") : null,
@@ -40,15 +44,17 @@ export default defineApp({
 
     root.render(
       <StrictMode>
-        <TranslatorProvider value={t}>
-          <QueryClientProvider client={queryClient}>
-            <ConfigProvider locale={locale}>
-              <ToastProvider>
-                <BangumiCalendarPage />
-              </ToastProvider>
-            </ConfigProvider>
-          </QueryClientProvider>
-        </TranslatorProvider>
+        <RuntimeProvider value={ctx}>
+          <TranslatorProvider value={t}>
+            <QueryClientProvider client={queryClient}>
+              <ConfigProvider locale={locale}>
+                <ToastProvider>
+                  <BangumiCalendarPage />
+                </ToastProvider>
+              </ConfigProvider>
+            </QueryClientProvider>
+          </TranslatorProvider>
+        </RuntimeProvider>
       </StrictMode>,
     );
     return () => root.unmount();
